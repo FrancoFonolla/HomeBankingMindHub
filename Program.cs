@@ -1,4 +1,5 @@
 using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<HomeBankingContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("HomeBankingConexion")));
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 var app = builder.Build();
 using (var scope= app.Services.CreateScope())
 {
