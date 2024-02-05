@@ -1,4 +1,4 @@
-﻿namespace HomeBankingMindHub.Models
+﻿namespace HomeBankingMindHub.Models.DTOs
 {
     public class AccountDTO
     {
@@ -9,5 +9,6 @@
         public DateTime CreationDate { get; set; }
 
         public double Balance { get; set; }
+        public ICollection<TransactionDTO> Transactions { get; set; }
     }
 }

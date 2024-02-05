@@ -1,5 +1,6 @@
 using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Implements;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -16,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 var app = builder.Build();
 using (var scope= app.Services.CreateScope())
 {
@@ -44,6 +46,8 @@ else
 
 }
 app.UseStaticFiles();
+//app.UseDefaultFiles();
+
 
 app.UseRouting();
 

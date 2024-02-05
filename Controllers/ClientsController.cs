@@ -1,130 +1,56 @@
 ﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.DTOs;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HomeBankingMindHub.Controllers
 {
-        [Route("api/[controller]")]
+    [Route("api/[controller]")]
 
-        [ApiController]
+    [ApiController]
 
-        public class ClientsController : ControllerBase
+    public class ClientsController : ControllerBase
+
+    {
+
+        private IClientRepository _clientRepository;
+
+
+
+        public ClientsController(IClientRepository clientRepository)
 
         {
 
-            private IClientRepository _clientRepository;
+            _clientRepository = clientRepository;
+
+        }
 
 
 
-            public ClientsController(IClientRepository clientRepository)
+        [HttpGet]
 
-            {
+        public IActionResult Get()
 
-                _clientRepository = clientRepository;
+        {
 
-            }
-
-
-
-            [HttpGet]
-
-            public IActionResult Get()
+            try
 
             {
 
-                try
+                var clients = _clientRepository.GetAllClients();
+
+
+
+                var clientsDTO = new List<ClientDTO>();
+
+
+
+                foreach (Client client in clients)
 
                 {
 
-                    var clients = _clientRepository.GetAllClients();
-
-
-
-                    var clientsDTO = new List<ClientDTO>();
-
-
-
-                    foreach (Client client in clients)
-
-                    {
-
-                        var newClientDTO = new ClientDTO
-
-                        {
-
-                            Id = client.Id,
-
-                            Email = client.Email,
-
-                            FirstName = client.FirstName,
-
-                            LastName = client.LastName,
-
-                            Accounts = client.Accounts.Select(ac => new AccountDTO
-
-                            {
-
-                                Id = ac.Id,
-
-                                Balance = ac.Balance,
-
-                                CreationDate = ac.CreationDate,
-
-                                Number = ac.Number
-
-                            }).ToList()
-
-                        };
-
-
-
-                        clientsDTO.Add(newClientDTO);
-
-                    }
-
-
-
-
-
-                    return Ok(clientsDTO);
-
-                }
-
-                catch (Exception ex)
-
-                {
-
-                    return StatusCode(500, ex.Message);
-
-                }
-
-            }
-
-
-
-            [HttpGet("{id}")]
-
-            public IActionResult Get(long id)
-
-            {
-
-                try
-
-                {
-
-                    var client = _clientRepository.FindById(id);
-
-                    if (client == null)
-
-                    {
-
-                        return Forbid();
-
-                    }
-
-
-
-                    var clientDTO = new ClientDTO
+                    var newClientDTO = new ClientDTO
 
                     {
 
@@ -154,18 +80,119 @@ namespace HomeBankingMindHub.Controllers
 
 
 
-                    return Ok(clientDTO);
+                    clientsDTO.Add(newClientDTO);
 
                 }
 
-                catch (Exception ex)
+
+
+
+
+                return Ok(clientsDTO);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                return StatusCode(500, ex.Message);
+
+            }
+
+        }
+
+
+
+        [HttpGet("{id}")]
+
+        public IActionResult Get(long id)
+
+        {
+
+            try
+
+            {
+
+                var client = _clientRepository.FindById(id);
+
+                if (client == null)
 
                 {
 
-                    return StatusCode(500, ex.Message);
+                    return Forbid();
 
                 }
 
+
+
+                var clientDTO = new ClientDTO
+
+                {
+
+                    Id = client.Id,
+
+                    Email = client.Email,
+
+                    FirstName = client.FirstName,
+
+                    LastName = client.LastName,
+
+                    Accounts = client.Accounts.Select(ac => new AccountDTO
+
+                    {
+
+                        Id = ac.Id,
+
+                        Balance = ac.Balance,
+
+                        CreationDate = ac.CreationDate,
+
+                        Number = ac.Number
+
+                    }).ToList()
+
+                };
+
+
+
+                return Ok(clientDTO);
+
             }
+
+            catch (Exception ex)
+
+            {
+
+                return StatusCode(500, ex.Message);
+
+            }
+
+        }
+        [HttpPost]
+        public IActionResult Post([FromBody] ClientDTO model)
+        {
+            if(model.Email.IsNullOrEmpty() || model.FirstName.IsNullOrEmpty() || model.LastName.IsNullOrEmpty())
+            {
+                return BadRequest("Se requieren todos los campos");
+            }
+            try
+            {
+                var client= new Client();
+                client.Email = model.Email;
+                    client.FirstName = model.FirstName;
+                client.LastName = model.LastName;
+                client.Password = "141516";
+                _clientRepository.Save(client);
+                return Created();
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
     }
+}
