@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add controllers to container
-builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve); //IgnoreCycles
 // Add services to the container.
 
 builder.Services.AddRazorPages();

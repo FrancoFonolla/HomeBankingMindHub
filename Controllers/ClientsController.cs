@@ -75,7 +75,7 @@ namespace HomeBankingMindHub.Controllers
                             Number = ac.Number
 
                         }).ToList(),
-                        Loans = client.ClientLoans.Select(cl => new ClientLoanDTO
+                        Credits = client.ClientLoans.Select(cl => new ClientLoanDTO
                         {
                             Id = cl.Id,
                             LoanId = cl.LoanId,
@@ -171,7 +171,7 @@ namespace HomeBankingMindHub.Controllers
                         Number = ac.Number
 
                     }).ToList(),
-                    Loans = client.ClientLoans.Select(cl=> new ClientLoanDTO
+                    Credits = client.ClientLoans.Select(cl=> new ClientLoanDTO
                     {
                         Id= cl.Id,
                         LoanId = cl.LoanId,
