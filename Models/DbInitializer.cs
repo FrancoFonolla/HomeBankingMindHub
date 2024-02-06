@@ -4,11 +4,28 @@
     {
         public static void Initilize(HomeBankingContext context)
         {
+            if (!context.Account.Any())
+            {
+                var accountFranco = context.Clients.FirstOrDefault(c => c.Email == "francofonolla@gmail.com");
+                if (accountFranco != null)
+                {
+                    var accounts = new Account[]
+                    {
+                        new Account {ClientId = accountFranco.Id, CreationDate = DateTime.Now, Number = "FRA001", Balance = 0 }
+                    };
+                    foreach (Account account in accounts)
+                    {
+                        context.Account.Add(account);
+                    }
+                    context.SaveChanges();
+
+                }
+            }
             if (!context.Transaction.Any())
 
             {
 
-                var account1 = context.Account.FirstOrDefault(c => c.Number == "VIN001");
+                var account1 = context.Account.FirstOrDefault(c => c.Number == "FRA001");
 
                 if (account1 != null)
 
@@ -18,11 +35,11 @@
 
                     {
 
-                        new Transaction { AccountId= account1.Id, Amount = 10000, Date= DateTime.Now.AddHours(-5), Description = "Transferencia reccibida", Type = TransactionType.CREDIT.ToString() },
+                        new Transaction { AccountId= account1.Id, Amount = 15000, Date= DateTime.Now.AddHours(-5), Description = "Transferencia reccibida", Type = TransactionType.CREDIT.ToString() },
 
-                        new Transaction { AccountId= account1.Id, Amount = -2000, Date= DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre", Type = TransactionType.DEBIT.ToString() },
+                        new Transaction { AccountId= account1.Id, Amount = -2500, Date= DateTime.Now.AddHours(-6), Description = "Compra en tienda mercado libre", Type = TransactionType.DEBIT.ToString() },
 
-                        new Transaction { AccountId= account1.Id, Amount = -3000, Date= DateTime.Now.AddHours(-7), Description = "Compra en tienda xxxx", Type = TransactionType.DEBIT.ToString() },
+                        new Transaction { AccountId= account1.Id, Amount = -7000, Date= DateTime.Now.AddHours(-7), Description = "Compra en tienda xxxx", Type = TransactionType.DEBIT.ToString() },
 
                     };
                     double newBalance = 0;

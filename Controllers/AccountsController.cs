@@ -35,7 +35,8 @@ namespace HomeBankingMindHub.Controllers
                         Transactions = account.Transactions.Select(tr => new TransactionDTO { Id = tr.Id,
                             Amount = tr.Amount,
                             Date = tr.Date,
-                            Description = tr.Description }).ToList()
+                            Description = tr.Description,
+                            Type=tr.Type}).ToList()
                     };
                     accountsDTO.Add(newAccountDTO);
                 }
