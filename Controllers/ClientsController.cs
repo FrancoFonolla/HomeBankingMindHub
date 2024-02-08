@@ -85,14 +85,14 @@ namespace HomeBankingMindHub.Controllers
                         }).ToList(),
                         Cards=client.Cards.Select(c=> new CardDTO
                         {
-                            Id=c.Id,
+                            Id = c.Id,
                             CardHolder = c.CardHolder,
-                            Color = c.Color,
-                            Cvv=c.Cvv,
+                            Color = nameof(c.Color),
+                            Cvv = c.Cvv,
                             FromDate = c.FromDate,
-                            Number=c.Number,
-                            ThruDate=c.ThruDate,
-                            Type=c.Type,
+                            Number = c.Number,
+                            ThruDate = c.ThruDate,
+                            Type = nameof(c.Type),
                         }).ToList()
 
 
@@ -183,12 +183,12 @@ namespace HomeBankingMindHub.Controllers
                     {
                         Id = c.Id,
                         CardHolder = c.CardHolder,
-                        Color = c.Color,
+                        Color = nameof(c.Color),
                         Cvv = c.Cvv,
                         FromDate = c.FromDate,
                         Number = c.Number,
                         ThruDate = c.ThruDate,
-                        Type = c.Type,
+                        Type = nameof(c.Type),
                     }).ToList()
 
                 };
@@ -273,12 +273,12 @@ namespace HomeBankingMindHub.Controllers
                     {
                         Id = c.Id,
                         CardHolder = c.CardHolder,
-                        Color = c.Color,
+                        Color = nameof(c.Color),
                         Cvv = c.Cvv,
                         FromDate = c.FromDate,
                         Number = c.Number,
                         ThruDate = c.ThruDate,
-                        Type = c.Type
+                        Type = nameof(c.Type)
                     }).ToList()
                 };
                 return Ok(clientDTO);
