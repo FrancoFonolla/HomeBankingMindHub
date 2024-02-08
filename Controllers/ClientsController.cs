@@ -87,12 +87,12 @@ namespace HomeBankingMindHub.Controllers
                         {
                             Id=c.Id,
                             CardHolder = c.CardHolder,
-                            Color = c.Color,
+                            Color = nameof(c.Color),
                             Cvv=c.Cvv,
                             FromDate = c.FromDate,
                             Number=c.Number,
                             ThruDate=c.ThruDate,
-                            Type=c.Type,
+                            Type=nameof(c.Type),
                         }).ToList()
 
 
@@ -183,12 +183,12 @@ namespace HomeBankingMindHub.Controllers
                     {
                         Id = c.Id,
                         CardHolder = c.CardHolder,
-                        Color = c.Color,
+                        Color = nameof(c.Color),
                         Cvv = c.Cvv,
                         FromDate = c.FromDate,
                         Number = c.Number,
                         ThruDate = c.ThruDate,
-                        Type = c.Type,
+                        Type = nameof(c.Type),
                     }).ToList()
 
                 };
