@@ -208,31 +208,31 @@ namespace HomeBankingMindHub.Controllers
             }
 
         }
-        [HttpPost]
-        public IActionResult Post([FromBody] ClientCreateDTO model)
-        {
-            if(model.Email.IsNullOrEmpty() || model.FirstName.IsNullOrEmpty() || model.LastName.IsNullOrEmpty())
-            {
-                return BadRequest("Se requieren todos los campos");
-            }
-            try
-            {
-                var client= new Client();
-                client.Email = model.Email;
-                    client.FirstName = model.FirstName;
-                client.LastName = model.LastName;
-                client.Password = "141516";
-                _clientRepository.Save(client);
-                return Created();
+        //[HttpPost]
+        //public IActionResult Post([FromBody] ClientCreateDTO model)
+        //{
+        //    if(model.Email.IsNullOrEmpty() || model.FirstName.IsNullOrEmpty() || model.LastName.IsNullOrEmpty())
+        //    {
+        //        return BadRequest("Se requieren todos los campos");
+        //    }
+        //    try
+        //    {
+        //        var client= new Client();
+        //        client.Email = model.Email;
+        //            client.FirstName = model.FirstName;
+        //        client.LastName = model.LastName;
+        //        client.Password = "141516";
+        //        _clientRepository.Save(client);
+        //        return Created();
 
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
 
-        }
+        //}
         [HttpGet("current")]
         public IActionResult GetCurrent()
         {
@@ -284,6 +284,35 @@ namespace HomeBankingMindHub.Controllers
                 return Ok(clientDTO);
             }
             catch(Exception ex)
+            {
+                return StatusCode(500,ex.Message);
+            }
+        }
+        [HttpPost]
+        public IActionResult Post([FromBody] Client client)
+        {
+            try
+            {
+                //validamos datos antes
+                if (String.IsNullOrEmpty(client.Email) || String.IsNullOrEmpty(client.Password) || String.IsNullOrEmpty(client.FirstName) || String.IsNullOrEmpty(client.LastName))
+                    return StatusCode(403, "datos invalidos");
+                //buscamos si ya existe el usuario
+                Client user = _clientRepository.FindByEmail(client.Email);
+                if(user != null)
+                {
+                    return StatusCode(403, "Email esta en uso");
+                }
+                Client newClient = new Client
+                {
+                    Email = client.Email,
+                    Password = client.Password,
+                    FirstName = client.FirstName,
+                    LastName = client.LastName,
+                };
+                _clientRepository.Save(newClient);
+                return Created("", newClient);
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500,ex.Message);
             }
