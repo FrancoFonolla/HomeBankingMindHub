@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using System.Security.Claims;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace HomeBankingMindHub.Controllers
 {
@@ -38,11 +39,13 @@ namespace HomeBankingMindHub.Controllers
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
                 return Ok();
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
-            [HttpPost("logout")]
+        }
+        [HttpPost("logout")]
             public async Task<IActionResult> Logout()
             {
                 try
@@ -55,6 +58,6 @@ namespace HomeBankingMindHub.Controllers
                     return StatusCode(500, ex.Message);
                 }
             }
-        }
+        
     }
 }
