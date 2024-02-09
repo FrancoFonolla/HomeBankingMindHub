@@ -4,6 +4,7 @@
     {
         public static void Initilize(HomeBankingContext context)
         {
+            
             if (!context.Cards.Any())
             {
                 //buscamos al unico cliente
@@ -16,8 +17,8 @@
                         new Card {
                             ClientId= client1.Id,
                             CardHolder = client1.FirstName + " " + client1.LastName,
-                            Type = CardType.DEBIT.ToString(),
-                            Color = CardColor.GOLD.ToString(),
+                            Type = CardType.DEBIT,
+                            Color = CardColor.GOLD,
                             Number = "3325-6745-7876-4445",
                             Cvv = 990,
                             FromDate= DateTime.Now,
@@ -26,8 +27,8 @@
                         new Card {
                             ClientId= client1.Id,
                             CardHolder = client1.FirstName + " " + client1.LastName,
-                            Type = CardType.CREDIT.ToString(),
-                            Color = CardColor.TITANIUM.ToString(),
+                            Type = CardType.CREDIT,
+                            Color = CardColor.TITANIUM,
                             Number = "2234-6745-552-7888",
                             Cvv = 750,
                             FromDate= DateTime.Now,

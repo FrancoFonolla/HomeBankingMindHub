@@ -1,4 +1,5 @@
 ﻿using HomeBankingMindHub.Models;
+using HomeBankingMindHub.Models.DTOs;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -10,7 +11,7 @@ using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace HomeBankingMindHub.Controllers
 {
-    [Route("api/auth")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthController :ControllerBase
     {
@@ -20,12 +21,12 @@ namespace HomeBankingMindHub.Controllers
             _clientRepository = clientRepository;
         }
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] Client client)
+        public async Task<IActionResult> Login([FromBody] ClientLoginDTO client)
         {
             try
             {
                 Client user = _clientRepository.FindByEmail(client.Email);
-                if (user == null || !String.Equals(user.Password, client.Password))
+                if (user == null || PasswordHasher.VerifyPassword(client.Password, user.HashedPassword, user.Salt))
                     return Unauthorized();
                 var claims = new List<Claim>
                 {

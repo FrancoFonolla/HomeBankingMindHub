@@ -43,5 +43,10 @@ namespace HomeBankingMindHub.Repositories.Implements
                 .Include (client => client.Cards)
                 .FirstOrDefault();
         }
+        public void UpdateClient(Client client)
+        {
+            Update(client);
+            SaveChanges();
+        }
     }
 }

@@ -2,8 +2,8 @@
 {
     public enum CardColor
     {
-        GOLD,
-        SILVER,
-        TITANIUM
+        GOLD=1,
+        SILVER=2,
+        TITANIUM=3
     }
 }
