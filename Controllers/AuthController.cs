@@ -26,7 +26,9 @@ namespace HomeBankingMindHub.Controllers
             try
             {
                 Client user = _clientRepository.FindByEmail(client.Email);
-                if (user == null || PasswordHasher.VerifyPassword(client.Password, user.HashedPassword, user.Salt))
+                Boolean codition = PasswordHasher.VerifyPassword(client.Password, user.HashedPassword, user.Salt);
+
+                if (user == null || !PasswordHasher.VerifyPassword(client.Password, user.HashedPassword, user.Salt))
                     return Unauthorized();
                 var claims = new List<Claim>
                 {

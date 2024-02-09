@@ -9,7 +9,7 @@ namespace HomeBankingMindHub.Models
         public string Email { get; set; }
         public byte[] HashedPassword { get; set; }
         public byte[] Salt {  get; set; }
-        public string Password { get; set; }
+        
 
         public ICollection<Account> Accounts { get; set; }
         public ICollection<ClientLoan> ClientLoans { get; set; }

@@ -3,6 +3,8 @@ using HomeBankingMindHub.Models.DTOs;
 using HomeBankingMindHub.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.RegularExpressions;
+
 
 namespace HomeBankingMindHub.Controllers
 {
@@ -289,8 +291,16 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpPost]
-        public IActionResult Post([FromBody] Client client)
+        public IActionResult Post([FromBody] ClientCreateDTO client)
         {
+            static bool IsValidEmail(string email)
+            {
+                // Expresión regular para verificar el formato de la dirección de correo electrónico
+                string pattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+
+                // Verifica si la cadena coincide con el patrón
+                return Regex.IsMatch(email, pattern);
+            }
             try
             {
                 //validamos datos antes
@@ -298,11 +308,16 @@ namespace HomeBankingMindHub.Controllers
                     return StatusCode(403, "datos invalidos");
                 //buscamos si ya existe el usuario
                 Client user = _clientRepository.FindByEmail(client.Email);
+                if(!IsValidEmail(client.Email))
+                {
+                    return StatusCode(400, "La dirección de correo electronico no es valida");
+                }
                 if(user != null)
                 {
                     return StatusCode(403, "Email esta en uso");
                 }
-                (byte[] saltn, byte[] hashn)= PasswordHasher.HashPassword(client.Password);
+                var password=client.Password;
+                (byte[] saltn, byte[] hashn)= PasswordHasher.HashPassword(password);
                 Client newClient = new Client
                 {
                     Email = client.Email,
@@ -319,33 +334,33 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500,ex.Message);
             }
         }
-        [HttpPost("changepassword")]
-        public async Task<IActionResult> Post([FromBody] ChangePasswordDTO changePasswordDTO)
-        {
-            try
-            {
-                if (String.IsNullOrEmpty(changePasswordDTO.CurrentPassword)||String.IsNullOrEmpty(changePasswordDTO.Email)||String.IsNullOrEmpty(changePasswordDTO.NewPassword))
-                    return StatusCode(403, "datos invalidos");
-                Client Client = _clientRepository.FindByEmail(changePasswordDTO.Email);
-                if (Client == null)
-                {
-                    return StatusCode(404, "Cliente no encontrado");
-                }
-                if (Client.Password!=changePasswordDTO.CurrentPassword)
-                {
-                    return StatusCode(400, "Contraseña no valida");
-                }
-                (byte[] salt, byte[] hash) = PasswordHasher.HashPassword(changePasswordDTO.NewPassword);
-                Client.Salt = salt;
-                Client.HashedPassword = hash;
-                _clientRepository.UpdateClient(Client);
+        //[HttpPost("changepassword")]
+        //public async Task<IActionResult> Post([FromBody] ChangePasswordDTO changePasswordDTO)
+        //{
+        //    try
+        //    {
+        //        if (String.IsNullOrEmpty(changePasswordDTO.CurrentPassword)||String.IsNullOrEmpty(changePasswordDTO.Email)||String.IsNullOrEmpty(changePasswordDTO.NewPassword))
+        //            return StatusCode(403, "datos invalidos");
+        //        Client Client = _clientRepository.FindByEmail(changePasswordDTO.Email);
+        //        if (Client == null)
+        //        {
+        //            return StatusCode(404, "Cliente no encontrado");
+        //        }
+        //        if (Client.Password!=changePasswordDTO.CurrentPassword)
+        //        {
+        //            return StatusCode(400, "Contraseña no valida");
+        //        }
+        //        (byte[] salt, byte[] hash) = PasswordHasher.HashPassword(changePasswordDTO.NewPassword);
+        //        Client.Salt = salt;
+        //        Client.HashedPassword = hash;
+        //        _clientRepository.UpdateClient(Client);
                 
                 
-                return StatusCode(200, "Cambiado correctamente");
-            }catch (Exception ex)
-            {
-                return StatusCode(500,ex.Message);
-            }
-        }
+        //        return StatusCode(200, "Cambiado correctamente");
+        //    }catch (Exception ex)
+        //    {
+        //        return StatusCode(500,ex.Message);
+        //    }
+        //}
     }
 }
