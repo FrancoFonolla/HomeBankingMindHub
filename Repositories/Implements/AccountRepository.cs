@@ -34,8 +34,9 @@ namespace HomeBankingMindHub.Repositories.Implements
                 {
                     condition = false;
                 }
-                account.Number = vin;
+                
             }
+            account.Number = vin;
             Create(account);
             SaveChanges();
         }
