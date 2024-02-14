@@ -1,12 +1,13 @@
 ﻿namespace HomeBankingMindHub.Models
+
 {
-    public class Utils
+    public class Utiles
     {
-        public string GeneratedRandomVIN()
+        public  string GeneratedRandomVIN()
         {
             Random random = new Random();
             int randomNumber = random.Next(100000, 999999);
-            return "VIN-" + randomNumber;
+            return ("VIN-" + randomNumber);
         }
     }
 }
