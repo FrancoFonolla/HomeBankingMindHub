@@ -1,6 +1,7 @@
 ﻿using HomeBankingMindHub.Models;
 using HomeBankingMindHub.Models.DTOs;
 using HomeBankingMindHub.Repositories;
+using HomeBankingMindHub.Repositories.Implements;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
@@ -17,15 +18,16 @@ namespace HomeBankingMindHub.Controllers
     {
 
         private IClientRepository _clientRepository;
+        private IAccountRepository _accountRepository;
 
 
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository)
 
         {
 
             _clientRepository = clientRepository;
-
+            _accountRepository = accountRepository;
         }
 
 
@@ -334,6 +336,45 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500,ex.Message);
             }
         }
+        
+        [HttpPost("current/accounts")]
+        public IActionResult Post()
+        {
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+                if (email == string.Empty)
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+                long id = client.Id;
+                if (client.Accounts.Count >= 3)
+                {
+                    return Forbid();
+                }
+
+                var newAccount = new Account
+
+                {
+                    Balance = 0,
+                    CreationDate = DateTime.Now,
+                    Transactions = new List<Transaction>(),
+                    ClientId = id,
+                };
+                _accountRepository.Save(newAccount);
+                return Created("", newAccount);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
         //[HttpPost("changepassword")]
         //public async Task<IActionResult> Post([FromBody] ChangePasswordDTO changePasswordDTO)
         //{
@@ -354,8 +395,8 @@ namespace HomeBankingMindHub.Controllers
         //        Client.Salt = salt;
         //        Client.HashedPassword = hash;
         //        _clientRepository.UpdateClient(Client);
-                
-                
+
+
         //        return StatusCode(200, "Cambiado correctamente");
         //    }catch (Exception ex)
         //    {
