@@ -6,7 +6,7 @@
         public  string GeneratedRandomVIN()
         {
             Random random = new Random();
-            int randomNumber = random.Next(100000, 999999);
+            int randomNumber = random.Next(0, 100000000);
             return ("VIN-" + randomNumber);
         }
     }
