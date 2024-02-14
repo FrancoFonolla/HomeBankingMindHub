@@ -444,6 +444,44 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpGet("current/cards")]
+        public IActionResult GetCard (){
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+                if (email == string.Empty)
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+                var cards = _cardRepository.GetCardsByClient(client.Id);
+                var cardsDTO=new List<CardDTO>();
+                foreach (Card card in cards)
+                {
+                    CardDTO cardDTO = new CardDTO
+                    {
+                        CardHolder = card.CardHolder,
+                        Number = card.Number,
+                        Color = card.Color.ToString(),
+                        Type = card.Type.ToString(),
+                        Cvv = card.Cvv,
+                        FromDate = card.FromDate,
+                        ThruDate = card.ThruDate,
+
+
+                    };
+                    cardsDTO.Add(cardDTO);
+                }
+                return Ok(cardsDTO);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
         //[HttpPost("changepassword")]
         //public async Task<IActionResult> Post([FromBody] ChangePasswordDTO changePasswordDTO)
         //{
