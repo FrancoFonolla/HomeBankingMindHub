@@ -19,15 +19,17 @@ namespace HomeBankingMindHub.Controllers
 
         private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
+        private ICardRepository _cardRepository;
 
 
 
-        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository)
 
         {
 
             _clientRepository = clientRepository;
             _accountRepository = accountRepository;
+            _cardRepository = cardRepository;
         }
 
 
@@ -329,6 +331,26 @@ namespace HomeBankingMindHub.Controllers
                     LastName = client.LastName,
                 };
                 _clientRepository.Save(newClient);
+                Client clientnew = _clientRepository.FindByEmail(client.Email);
+                if(clientnew == null)
+                {
+                    return StatusCode(500, "error al crear la cuenta");
+                }
+                if (clientnew.Accounts.Count >= 3)
+                {
+                    return Forbid();
+                }
+
+                var newAccount = new Account
+
+                {
+                    Balance = 0,
+                    CreationDate = DateTime.Now,
+                    Transactions = new List<Transaction>(),
+                    ClientId = clientnew.Id,
+                };
+                _accountRepository.Save(newAccount);
+
                 return Created("", newClient);
             }
             catch (Exception ex)
@@ -371,6 +393,53 @@ namespace HomeBankingMindHub.Controllers
 
             }
             catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost("current/cards")]
+        public IActionResult Post(CardDTO cardFront)
+        {
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+                if (email == string.Empty)
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+                long id = client.Id;
+                IEnumerable<Card> cards= _cardRepository.GetCardsByClient(id);
+                foreach (Card card in cards)
+                {
+                    if (cardFront.Type == card.Type.ToString())
+                    {
+                        if(cardFront.Color== card.Color.ToString())
+                        {
+                            return Forbid();
+                        }
+                    }
+                }
+                if (cardFront.Type == CardType.CREDIT.ToString())
+                {
+
+                }
+                Card newcard = new Card
+                {
+                    Type = (cardFront.Type == CardType.DEBIT.ToString()) ? CardType.DEBIT : CardType.CREDIT,
+                    CardHolder = client.FirstName + " " + client.LastName,
+                    FromDate = DateTime.Now,
+                    Color= (cardFront.Color== CardColor.TITANIUM.ToString()) ? CardColor.TITANIUM:(cardFront.Color==CardColor.SILVER.ToString()) ? CardColor.SILVER:CardColor.GOLD,
+                    ThruDate = (cardFront.Type == CardType.DEBIT.ToString()) ? DateTime.Now.AddYears(4) : DateTime.Now.AddYears(5),
+                    ClientId = client.Id,
+                };
+                _cardRepository.Save(newcard);
+                return Created("", newcard);
+            }catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
