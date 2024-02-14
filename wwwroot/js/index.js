@@ -63,7 +63,6 @@
                     this.errorMsg = "Sign up failed, check the information"
                     this.errorToats.show();
                 })
-                console.log(this)
         },
         showSignUpToogle: function () {
             this.showSignUp = !this.showSignUp;
