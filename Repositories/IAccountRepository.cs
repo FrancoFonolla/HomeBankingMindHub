@@ -8,6 +8,6 @@ namespace HomeBankingMindHub.Repositories
         void Save(Account account);
         Account FindById(long id);
         IEnumerable<Account> GetAccountsByClient(long clientId);
-        Account FindByVIN(string number);
+        Account FindByNumber(string number);
     }
 }

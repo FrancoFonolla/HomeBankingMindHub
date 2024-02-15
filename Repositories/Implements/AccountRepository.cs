@@ -23,21 +23,28 @@ namespace HomeBankingMindHub.Repositories.Implements
         }
         public void Save(Account account)
         {
-            bool condition = true;
-            string vin = string.Empty;
-            while(condition)
+            if (account.Id == 0)
             {
-
-                vin = Utils.GeneratedRandomVIN();
-                var acc = FindByVIN(vin);
-                if (acc ==null)
+                bool condition = true;
+                string vin = string.Empty;
+                while (condition)
                 {
-                    condition = false;
+
+                    vin = Utils.GeneratedRandomVIN();
+                    var acc = FindByNumber(vin);
+                    if (acc == null)
+                    {
+                        condition = false;
+                    }
+
                 }
-                
+                account.Number = vin;
+                Create(account);
             }
-            account.Number = vin;
-            Create(account);
+            else
+            {
+                Update(account);
+            }
             SaveChanges();
         }
         public IEnumerable<Account> GetAccountsByClient(long clientId)
@@ -46,9 +53,9 @@ namespace HomeBankingMindHub.Repositories.Implements
                 .Include(account => account.Transactions)
                 .ToList();
         }
-        public Account FindByVIN(string number)
+        public Account FindByNumber(string number)
         {
-            return FindByCondition(account => account.Number== number)
+            return FindByCondition(account => account.Number.ToUpper()== number.ToUpper())
                 .Include(account=>account.Transactions)
                 .FirstOrDefault() ;
         }
