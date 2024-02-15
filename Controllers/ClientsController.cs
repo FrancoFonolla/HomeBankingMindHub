@@ -397,6 +397,76 @@ namespace HomeBankingMindHub.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+        [HttpGet("current/accounts")]
+        public IActionResult GetAccounts()
+        {
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+                if (email == string.Empty)
+                {
+                    return Forbid();
+                }
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+                long id = client.Id;
+                var accounts = _accountRepository.GetAccountsByClient(id);
+                var accountsDTO = new List<AccountDTO>();
+                foreach (Account account in accounts)
+                {
+                    AccountDTO accountDTO = new AccountDTO
+                    {
+                        Balance = account.Balance,
+                        Number = account.Number,
+                        CreationDate = account.CreationDate,
+                        Id = id,
+
+                    };
+                    accountsDTO.Add(accountDTO);
+                }
+                return Ok(accountsDTO);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet("current/accounts/{id}")]
+        public IActionResult GetAccount(long id)
+        {
+            try
+            {
+                var account = _accountRepository.FindById(id);
+                if (account == null)
+                {
+                    return Forbid();
+                }
+                var accountDTO = new AccountDTO
+                {
+                    Id = account.Id,
+                    Number = account.Number,
+                    Balance = account.Balance,
+                    CreationDate = account.CreationDate,
+                    Transactions = account.Transactions.Select(tr => new TransactionDTO
+                    {
+                        Id = tr.Id,
+                        Type = tr.Type,
+                        Amount = tr.Amount,
+                        Description = tr.Description,
+                        Date = tr.Date
+                    }).ToList()
+                };
+                return Ok(accountDTO);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+
+            }
+        }
         [HttpPost("current/cards")]
         public IActionResult Post(CardDTO cardFront)
         {
