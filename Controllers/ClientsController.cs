@@ -494,10 +494,6 @@ namespace HomeBankingMindHub.Controllers
                         }
                     }
                 }
-                if (cardFront.Type == CardType.CREDIT.ToString())
-                {
-
-                }
                 Card newcard = new Card
                 {
                     Type = (cardFront.Type == CardType.DEBIT.ToString()) ? CardType.DEBIT : CardType.CREDIT,
