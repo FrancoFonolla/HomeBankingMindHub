@@ -1,12 +1,12 @@
 ﻿using HomeBankingMindHub.Models;
-using System.Transactions;
 using Transaction = HomeBankingMindHub.Models.Transaction;
 
-namespace HomeBankingMindHub.Repositories
+namespace HomeBankingMindHub.Repositories.Implements
 {
     public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRepository
     {
-        public TransactionRepository(HomeBankingContext repositoryContext) : base(repositoryContext) { 
+        public TransactionRepository(HomeBankingContext repositoryContext) : base(repositoryContext)
+        {
         }
         public Transaction FindByNumber(long id)
         {
