@@ -54,24 +54,38 @@ namespace HomeBankingMindHub.Controllers
         {
             try
             {
-                //verificamos sin el usuario esta autenticado
+                //verificamos si el usuario esta autenticado
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
                 if (email == string.Empty) return Forbid();
                 //verificamos si el cliente existe
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null) return Forbid();
-                //verificamos sin loan existe
+                //verificamos si loan existe
                 var loan = _loanRepository.FindById(loanApplication.LoanId);
                 if (loan == null) return Forbid();
-                //verificamos que amount no se mayor a maxamount ni que sea 0
-                if (loanApplication.Amount > loan.MaxAmount || loanApplication.Amount == 0) return Forbid();
+                //verificamos que amount no se mayor a maxamount ni que sea 0 o menor a 0
+                if (loanApplication.Amount > loan.MaxAmount || loanApplication.Amount <= 0 || loanApplication.Amount == null) return StatusCode(400, "Monto invalido");
                 //verificamos que payments no este vacio
-                if (loanApplication.Payments == string.Empty) return Forbid();
+                if (loanApplication.Payments == string.Empty) return StatusCode(400, "El campo payments no puede estar vacio");
+                //verificamos que la cantidad de pagos sea correcta
+                string[] paymentss = loan.Payments.Split(',');
+                bool prueba = false;
+                foreach (string payment in paymentss)
+                {
+                    if (payment == loanApplication.Payments)
+                    {
+                        prueba = true;
+                    }
+                }
+                if (!prueba) return StatusCode(400, "Cantidad de pagos invalida");
+
+
+
                 //verificamos que la cuenta exista
                 var account = _accountRepository.FindByNumber(loanApplication.ToAccountNumber);
                 if (account == null) return Forbid();
                 //verificamos que la cuenta pertenezca al usuario autenticado
-                if (account.Id != client.Id) return Forbid();
+                if (account.Id != client.Id) return StatusCode(400, "La cuenta no pertenece al cliente actual");
                 ClientLoan clientLoan = new ClientLoan
                 {
                     ClientId = client.Id,
