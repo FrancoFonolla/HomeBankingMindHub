@@ -7,17 +7,17 @@ namespace HomeBankingMindHub.Repositories.Implements
     
     public class CardRepository : RepositoryBase<Card>, ICardRepository
     {
-        Utiles utils=new Utiles();
+        
         public CardRepository(HomeBankingContext repositoryContext) : base(repositoryContext) { }
 
         public void Save(Card card)
         {
-            card.Cvv=utils.GenerateRandomCardCvv();
+            card.Cvv=Utiles.GenerateRandomCardCvv();
             bool condition = true;
             string number= string.Empty;
             while (condition)
             {
-                number = utils.GenerateRandomCardNumber();
+                number = Utiles.GenerateRandomCardNumber();
                 var car = FindCardByNumber(number);
                 if (car == null)
                 {
