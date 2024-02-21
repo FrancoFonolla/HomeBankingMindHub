@@ -13,7 +13,7 @@ namespace HomeBankingMindHub.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController :ControllerBase
+    public class AuthController : ControllerBase
     {
         private IClientRepository _clientRepository;
         public AuthController(IClientRepository clientRepository)
@@ -49,18 +49,19 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpPost("logout")]
-            public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()
+        {
+            try
             {
-                try
-                {
-                    await HttpContext.SignOutAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-                    return Ok();
-                }catch(Exception ex)
-                {
-                    return StatusCode(500, ex.Message);
-                }
+                await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
+                return Ok();
             }
-        
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
     }
 }

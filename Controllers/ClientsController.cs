@@ -27,7 +27,7 @@ namespace HomeBankingMindHub.Controllers
 
 
 
-        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository,IClientService clientService,IAccountService accountService,ICardService cardService)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository, IClientService clientService, IAccountService accountService, ICardService cardService)
 
         {
 
@@ -42,7 +42,7 @@ namespace HomeBankingMindHub.Controllers
 
 
         [HttpGet]
-
+        //endpoint para traer todos los clientes
         public IActionResult Get()
 
         {
@@ -50,56 +50,31 @@ namespace HomeBankingMindHub.Controllers
             try
 
             {
-
                 return Ok(_clientService.GetAllClients());
-
-            }
-
-            catch (Exception ex)
-
+            }catch (Exception ex)
             {
-
                 return StatusCode(500, ex.Message);
-
             }
-
         }
-
-
 
         [HttpGet("{id}")]
-
+        //endpoint para traer un cliente por id
         public IActionResult Get(long id)
-
         {
-
             try
-
             {
-
                 var obj = _clientService.GetClient(id);
-
-                if (obj.message!="ok")
-
+                if (obj.message != "ok")
                 {
-
-                    return StatusCode(403,obj.message);
-
+                    return StatusCode(403, obj.message);
                 }
                 return Ok(obj.Object);
-
-            }
-            
-
-            catch (Exception ex)
-
+            }catch (Exception ex)
             {
-                
                 return StatusCode(500, ex.Message);
-
             }
-
         }
+        //Endpoint viejo para creacion de cliente, fue reemplazado
         //[HttpPost]
         //public IActionResult Post([FromBody] ClientCreateDTO model)
         //{
@@ -126,6 +101,7 @@ namespace HomeBankingMindHub.Controllers
 
         //}
         [HttpGet("current")]
+        //endpoint para traer el cliente autenticado
         public IActionResult GetCurrent()
         {
             try
@@ -135,54 +111,47 @@ namespace HomeBankingMindHub.Controllers
                 if (client.code != 200) return StatusCode(client.code, client.message);
                 return Ok(client.Object);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return StatusCode(500,ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
         [HttpPost]
+        //endpoint de creacion de cliente
         public IActionResult Post([FromBody] ClientCreateDTO client)
         {
-            
             try
             {
                 //validamos datos antes
-                var newclient= _clientService.CreateClient(client);
-                if(newclient.message != "ok")
-                    return StatusCode(newclient.code,newclient.message);
-               
-                
-
+                var newclient = _clientService.CreateClient(client);
+                if (newclient.message != "ok")
+                    return StatusCode(newclient.code, newclient.message);
                 var newAccount = _accountService.CreateAccount(newclient.Object.Id);
-                if(newAccount.code!=200) return StatusCode(newAccount.code,newAccount.message);
-                
-                
-
-                return Created("",newclient.Object);
+                if (newAccount.code != 200) return StatusCode(newAccount.code, newAccount.message);
+                return Created("", newclient.Object);
             }
             catch (Exception ex)
             {
-                return StatusCode(500,ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
-        
+
         [HttpPost("current/accounts")]
+        //endpoint para creatr una cuenta en el cliente autenticado
         public IActionResult Post()
         {
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
-                
                 var client = _clientService.GetClientEmail(email);
                 if (client.code != 200)
                 {
-                    return StatusCode(client.code,client.message);
+                    return StatusCode(client.code, client.message);
                 }
                 long id = client.Object.Id;
-                var newaccount= _accountService.CreateAccount(id);
-                if(newaccount.code!=200)return StatusCode(newaccount.code,newaccount.message);
+                var newaccount = _accountService.CreateAccount(id);
+                if (newaccount.code != 200) return StatusCode(newaccount.code, newaccount.message);
                 return Created("", newaccount.Object);
-
             }
             catch (Exception ex)
             {
@@ -190,26 +159,27 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpGet("current/accounts")]
+        //enpoint para traer todas las cuentas del cliente autenticado
         public IActionResult GetAccounts()
         {
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
-               var client = _clientService.GetClientEmail(email);
-                if(client.code != 200)
+                var client = _clientService.GetClientEmail(email);
+                if (client.code != 200)
                 {
-                    return StatusCode(client.code,client.message);
+                    return StatusCode(client.code, client.message);
                 }
-                
-                
                 var accounts = _accountService.GetAllClientAccounts(client.Object.Id);
                 return Ok(accounts);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
         [HttpGet("current/accounts/{id}")]
+        //endpoint para traer una cuenta por Id
         public IActionResult GetAccount(long id)
         {
             try
@@ -217,9 +187,9 @@ namespace HomeBankingMindHub.Controllers
                 var account = _accountService.GetAccountById(id);
                 if (account.code != 200)
                 {
-                    return StatusCode(account.code,account.message);
+                    return StatusCode(account.code, account.message);
                 }
-               
+
                 return Ok(account.Object);
 
             }
@@ -230,47 +200,51 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpPost("current/cards")]
+        //endpoint de creacion de una tarjeta para el cliente autenticado
         public IActionResult Post(CardDTO cardFront)
         {
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
-               
+
                 var client = _clientService.GetClientEmail(email);
                 if (client.code != 200)
                 {
-                    return StatusCode(client.code,client.message);
+                    return StatusCode(client.code, client.message);
                 }
-                
-                
                 var newcard = _cardService.CreateCard(cardFront, client.Object);
-                if(newcard.code != 200)
+                if (newcard.code != 200)
                 {
-                    return StatusCode(newcard.code,newcard.message);
+                    return StatusCode(newcard.code, newcard.message);
                 }
                 return Created("", newcard.Object);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
         [HttpGet("current/cards")]
-        public IActionResult GetCard (){
+        //endpoint para traer todas las tarjetas del cliente autenticado
+        public IActionResult GetCard()
+        {
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
-                var client=_clientService.GetClientEmail(email);
+                var client = _clientService.GetClientEmail(email);
                 if (client.code != 200)
                 {
-                    return StatusCode(client.code ,client.message);
+                    return StatusCode(client.code, client.message);
                 }
                 var cardsDTO = _cardService.GetCards(client.Object.Cards);
                 return Ok(cardsDTO);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
+        //enpoint de cambio de contraseña se uso para encriptar contraseñas cuando se agrego la encriptacion
         //[HttpPost("changepassword")]
         //public async Task<IActionResult> Post([FromBody] ChangePasswordDTO changePasswordDTO)
         //{

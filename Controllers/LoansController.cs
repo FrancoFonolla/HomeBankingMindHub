@@ -16,9 +16,9 @@ namespace HomeBankingMindHub.Controllers
         public LoansController(ILoansService loansService)
         {
             _loansService = loansService;
-
         }
         [HttpGet]
+        //endpoint para traer todos los prestamos
         public IActionResult Get()
         {
             try
@@ -32,6 +32,7 @@ namespace HomeBankingMindHub.Controllers
             }
         }
         [HttpPost]
+        //enpoint de creacion de un prestamo para el cliente autenticado
         public IActionResult Post(LoanApplicationDTO loanApplication)
         {
             try
@@ -42,14 +43,11 @@ namespace HomeBankingMindHub.Controllers
                     return StatusCode(clientLoan.code, clientLoan.message);
                 }
                 return Created("Con exito", clientLoan.Object);
-
-
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
         }
-
     }
 }

@@ -17,6 +17,7 @@ namespace HomeBankingMindHub.Controllers
             _transactionService = transactionService;
         }
         [HttpPost]
+        //endpoint de creacion de transferencia
         public IActionResult Post([FromBody] TransferDTO transferDTO)
         {
             try
