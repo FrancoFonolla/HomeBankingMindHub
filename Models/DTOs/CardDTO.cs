@@ -10,5 +10,16 @@
         public int Cvv { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ThruDate { get; set; }
+        public CardDTO(long id, string cardHolder, string type, string color, string number, int cvv, DateTime? fromDate, DateTime? thruDate)
+        {
+            Id = id;
+            CardHolder = cardHolder;
+            Type = type;
+            Color = color;
+            Number = number;
+            Cvv = cvv;
+            FromDate = fromDate;
+            this.ThruDate= thruDate;
+        }
     }
 }

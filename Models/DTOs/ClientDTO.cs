@@ -17,5 +17,15 @@ namespace HomeBankingMindHub.Models.DTOs
         public ICollection<AccountDTO> Accounts { get; set; }
         public ICollection<ClientLoanDTO> Credits { get; set; }
         public ICollection<CardDTO> Cards { get; set; }
+        public ClientDTO(long id, string firstName, string lastName, string email, ICollection<AccountDTO> accounts, ICollection<ClientLoanDTO> credits, ICollection<CardDTO> cards)
+        {
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Accounts = accounts;
+            Credits = credits;
+            Cards = cards;
+        }
     }
 }
