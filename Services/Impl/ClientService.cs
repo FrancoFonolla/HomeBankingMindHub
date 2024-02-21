@@ -133,7 +133,7 @@ namespace HomeBankingMindHub.Services.Impl
         //metodo para creacion de cliente
         public responseClass<Client> CreateClient(ClientCreateDTO client)
         {
-            if (Utiles.IsValidEmail(client.Email))
+            if (!Utiles.IsValidEmail(client.Email))
             {
                 //verificamos que sea valida la direccion de correo
                 return new responseClass<Client>(null, "La direccion de correo no es valida", 400);

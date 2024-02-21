@@ -53,7 +53,7 @@ namespace HomeBankingMindHub.Services.Impl
             var account = _accountRepository.FindByNumber(loanApplication.ToAccountNumber);
             if (account == null) return new responseClass<ClientLoan>(null,"Cuenta  no existe", 400);
             //verificamos que la cuenta pertenezca al usuario autenticado
-            if (account.Id != client.Id) return new responseClass<ClientLoan>(null, "La cuenta no pertenece al cliente actual", 400);
+            if (account.ClientId != client.Id) return new responseClass<ClientLoan>(null, "La cuenta no pertenece al cliente actual", 400);
             ClientLoan clientLoan = new ClientLoan
             {
                 ClientId = client.Id,
