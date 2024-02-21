@@ -20,7 +20,7 @@ namespace HomeBankingMindHub.Services.Impl
             _loanRepository = loanRepository;
             _clientLoanRepository = clientLoanRepository;
         }
-        
+        //metodo para creacion de un prestamo
         public responseClass<ClientLoan> CreateLoan(LoanApplicationDTO loanApplication, string email)
         {
             if (email == string.Empty|| !Utiles.IsValidEmail(email)) return new responseClass<ClientLoan>(null,"Email invalido o vacio",400);
@@ -37,6 +37,7 @@ namespace HomeBankingMindHub.Services.Impl
             //verificamos que la cantidad de pagos sea correcta
             string[] paymentss = loan.Payments.Split(',');
             bool prueba = false;
+            //verificamos que la cantidad de pagos sea valida
             foreach (string payment in paymentss)
             {
                 if (payment == loanApplication.Payments)
@@ -75,20 +76,15 @@ namespace HomeBankingMindHub.Services.Impl
             _accountRepository.Save(account);
             return new responseClass<ClientLoan>(clientLoan, "ok", 200);
         }
-
+        //metodo para traer todos los prestamos
         public List<LoanDTO> GetAll()
         {
             var loans = _loanRepository.GetAll();
             var loansDTO = new List<LoanDTO>();
             foreach (Loan loan in loans)
             {
-                LoanDTO loanDTO = new LoanDTO
-                {
-                    Id = loan.Id,
-                    MaxAmount = loan.MaxAmount,
-                    Name = loan.Name,
-                    Payments = loan.Payments,
-                };
+                LoanDTO loanDTO = new LoanDTO(loan.Id,loan.Name,loan.MaxAmount,loan.Payments);
+                    
                 loansDTO.Add(loanDTO);
             }
             return loansDTO;

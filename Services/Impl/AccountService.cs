@@ -14,14 +14,17 @@ namespace HomeBankingMindHub.Services.Impl
             _accountRepository = accountRepository;
             _clientRepository = clientRepository;
         }
+        //metodo para crear una cuenta
         public responseClass<Account> CreateAccount(long Id)
         {
             var client= _clientRepository.FindById(Id);
             if (client == null)
             {
+                //verificamos que el cliente exista
                 return new responseClass<Account>(null, "No existe el cliente", 400);
             }
             if(client.Accounts.Count >= 3) {
+                //verificamos que el cliente no tenga mas de  3 cuentas
                 return new responseClass<Account>(null, "El cliente ya tiene 3 cuentas", 401);
             }
             Account account = new Account();
@@ -34,71 +37,43 @@ namespace HomeBankingMindHub.Services.Impl
             return new responseClass<Account>(account,"ok",200);
         }
         
+        //metodo para traer todas las cuentas
         public IEnumerable<AccountDTO> GetAccounts()
         {
             var accounts = _accountRepository.GetAllAccounts();
             var accountsDTO = new List<AccountDTO>();
             foreach (var account in accounts)
             {
-                var newAccountDTO = new AccountDTO
-                {
-                    Id = account.Id,
-                    Balance = account.Balance,
-                    CreationDate = account.CreationDate,
-                    Number = account.Number,
-                    Transactions = account.Transactions.Select(tr => new TransactionDTO
-                    {
-                        Id = tr.Id,
-                        Amount = tr.Amount,
-                        Date = tr.Date,
-                        Description = tr.Description,
-                        Type = tr.Type
-                    }).ToList()
-                };
+                var newAccountDTO = new AccountDTO(account.Id,account.Number,account.Balance,
+                    account.Transactions.Select(tr=> new TransactionDTO(tr.Id,tr.Type,tr.Amount,tr.Description,tr.Date)).ToList(),
+                    account.CreationDate);
                 accountsDTO.Add(newAccountDTO);
             }
             return accountsDTO;
         }
+        //metodo para traer todas las cuentas de un cliente
         public List<AccountDTO> GetAllClientAccounts(long id)
         {
             var accounts = _accountRepository.GetAccountsByClient(id);
             var accountsDTO = new List<AccountDTO>();
             foreach (Account account in accounts)
             {
-                AccountDTO accountDTO = new AccountDTO
-                {
-                    Balance = account.Balance,
-                    Number = account.Number,
-                    CreationDate = account.CreationDate,
-                    Id = id,
-
-                };
+                AccountDTO accountDTO = new AccountDTO(account.Id, account.Number, account.Balance, account.CreationDate);
                 accountsDTO.Add(accountDTO);
             }
             return accountsDTO;
         }
+        //metodo para traer una cuenta por Id
         public responseClass<AccountDTO> GetAccountById(long id)
         {
             var account = _accountRepository.FindById(id);
             if (account == null)
+                //verificamos que la cuenta exista
                 return new responseClass<AccountDTO>(null, "No existe la cuenta", 400);
-            var accountDTO = new AccountDTO
-            {
-                Id = account.Id,
-                Number = account.Number,
-                Balance = account.Balance,
-                CreationDate = account.CreationDate,
-                Transactions = account.Transactions.Select(tr => new TransactionDTO
-                {
-                    Id = tr.Id,
-                    Type = tr.Type,
-                    Amount = tr.Amount,
-                    Description = tr.Description,
-                    Date = tr.Date
-                }).ToList()
-            };
+            var accountDTO = new AccountDTO(account.Id,account.Number,account.Balance, account.Transactions.Select(tr=> new TransactionDTO(tr.Id,tr.Type,tr.Amount,tr.Description,tr.Date)).ToList(),account.CreationDate);
             return new responseClass<AccountDTO>(accountDTO,"ok",200);
         }
+        //metodo para verificar que existe una cuenta
         public bool VerifyAccountExist(long id)
         {
             return _accountRepository.FindById(id) == null;

@@ -15,31 +15,37 @@ namespace HomeBankingMindHub.Services.Impl
             _clientRepository = clientRepository;
             _accountRepository = accountRepository;
         }
-
+        //metodo de creacion de una transferencias
         public responseClass<Account> Create(TransferDTO transferDTO, string email)
         {
+            //verificamos si el email esta vacio
             if (email == string.Empty)
             {
                 return new responseClass<Account>(null, "Email vacio", 400);
             }            
             Client client = _clientRepository.FindByEmail(email);
             if (client == null)
+                //verificamos si existe el cliente
             {
                 return new responseClass<Account>(null, "No existe el cliente", 400);
 
             }
+            //verificamos que las cuentas no esten vacias
             if (transferDTO.FromAccountNumber == string.Empty || transferDTO.ToAccountNumber == string.Empty)
             {
                 return new responseClass<Account>(null,"Cuenta origen o de destino no proporcionada",400);
             }
+            //verificamos que no se este transfiriendo a la misma cuenta
             if (transferDTO.FromAccountNumber == transferDTO.ToAccountNumber)
             {
                 return new responseClass<Account>(null,"No se permite la transferencia a la misma cuenta",403);
             }
+            //verificamos que se alla dado una cantidad y una descripcion
             if (transferDTO.Amount == 0 | transferDTO.Description == string.Empty)
             {
                 return new responseClass<Account>(null,"Monto o descripcion no proporcionados", 400);
             }
+            //que la cantidad no sea negativa
             if(transferDTO.Amount <0)
             {
                 return new responseClass<Account>(null, "Monto invalido", 400);
@@ -47,19 +53,23 @@ namespace HomeBankingMindHub.Services.Impl
             Account fromAccount = _accountRepository.FindByNumber(transferDTO.FromAccountNumber);
             if (fromAccount.ClientId != client.Id)
             {
+                //si la cuenta pertenece al usuario actual
                 return new responseClass<Account>(null, "La cuenta de origen no pertenece al cliente autenticado", 403);
             }
             if (fromAccount == null)
             {
+                //que exista la cuenta desde la que se quiere transferir
                 return new responseClass<Account>(null, "Cuenta origen no existe", 400);
             }
             if (fromAccount.Balance < transferDTO.Amount)
             {
+                //la cuenta origen tenga saldo suficiente
                 return new responseClass<Account>(null, "Fondos insuficientes", 403);
             }
             Account toAccount = _accountRepository.FindByNumber(transferDTO.ToAccountNumber);
             if (toAccount == null)
             {
+                //que exista la cuenta a la que se quiere trasnferir
                 return new responseClass<Account>(null, "Cuenta de destino no existe", 403);
 
             }

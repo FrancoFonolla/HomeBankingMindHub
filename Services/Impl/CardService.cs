@@ -12,9 +12,11 @@ namespace HomeBankingMindHub.Services.Impl
         {
             _cardRepository = cardRepository;
         }
+        //metodo para creacion de una tarjeta
         public responseClass<Card> CreateCard(CardDTO cardFront, Client client)
         {
             IEnumerable<Card> cards = _cardRepository.GetCardsByClient(client.Id);
+            //verificamos que el cliente no tenga una tarjeta del mismo color y tipo
             foreach (Card card1 in cards)
             {
                 if (cardFront.Type == card1.Type.ToString())
@@ -31,26 +33,20 @@ namespace HomeBankingMindHub.Services.Impl
                 ClientId = client.Id,
             };
             _cardRepository.Save(card);
-            return new responseClass<Card>(card,"ok",200);
+            return new responseClass<Card>(card, "ok", 200);
         }
-        
+        //metodo para pasar tarjetas al front
         public List<CardDTO> GetCards(IEnumerable<Card> cards)
         {
             var cardsDTO = new List<CardDTO>();
             foreach (Card card in cards)
             {
-                CardDTO cardDTO = new CardDTO
-                {
-                    CardHolder = card.CardHolder,
-                    Number = card.Number,
-                    Color = card.Color.ToString(),
-                    Type = card.Type.ToString(),
-                    Cvv = card.Cvv,
-                    FromDate = card.FromDate,
-                    ThruDate = card.ThruDate,
-
-
-                };
+                CardDTO cardDTO = new CardDTO(card.Id,
+                    card.CardHolder,
+                    card.Type.ToString(),
+                    card.Color.ToString(),
+                    card.Number, card.Cvv,
+                    card.FromDate, card.ThruDate);
                 cardsDTO.Add(cardDTO);
             }
             return cardsDTO;
